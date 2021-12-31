@@ -12,7 +12,11 @@ Interferic
 https://github.com/nandoflorestan/midi-effects/blob/master/jesuscript/interferic.jsfx
 
 A JSFX plugin that watches the values of CC1 and CC4 and outputs something to CC1, hiding CC4.
-The output is given by (CC1value + CC4value - 64). But my purpose is simply to control dynamics in two passes.
+The output is given by...
+
+    CC1value + CC4value - 64
+
+My purpose is simply to control dynamics in two passes.
 First I input generic, linear crescendos and decrescendos on CC1 while I am composing. It's the main shape and I never touch it again
 unless it is something that I would change in notation (a drastic change). And I keep CC4 static in the middle (64).
 For the 2nd pass -- tweaking the performance -- I add CC4 changes which start and end in the middle. These are interferences to:
