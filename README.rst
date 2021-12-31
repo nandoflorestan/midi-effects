@@ -30,6 +30,8 @@ You could also route a single midi track to each of the ensemble tracks, to cont
 and then just add minor adjustments to each track individually.
 
 Currently this plugin watches only a single MIDI channel that you choose.
+To change multiple MIDI channels you need to use multiple effect instances in series.
+
 I wrote a multichannel version using Protoplug, but currently it's not stable.
 JSFX is a barbaric language to write programs in; I would prefer Lua, but unfortunately Protoplug is giving me trouble:
 https://github.com/pac-dev/protoplug/issues/47
