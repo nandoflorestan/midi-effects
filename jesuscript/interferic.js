@@ -11,7 +11,7 @@ in_pin:none
 out_pin:none
 
 slider1:  1 <1,  16, 1> Channel
-slider2: 11 <1, 127, 1> Dynamic CC
+slider2:  1 <1, 127, 1> Dynamic CC
 slider3: 64 <0, 127, 1> Dynamic value
 slider4:  4 <1, 127, 1> Interferic CC
 slider5: 64 <0, 127, 1> Interferic value
