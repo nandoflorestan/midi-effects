@@ -1,0 +1,74 @@
+desc: Auto modulate vibrato CCs when CC2 is at 127
+//tags: MIDI processing routing
+// written by Nando Florestan
+
+slider1:   1 <1,  16, 1> First channel
+slider2:  16 <1,  16, 1> Last channel
+slider3:   0 <0, 126, 1> Vibrato depth offset
+slider4:  75 <1, 100, 1> Vibrato depth scale (%)
+slider5:  32 <0, 127, 1> Vibrato speed offset
+slider6:  40 <1, 100, 1> Vibrato speed scale (%)
+
+// MIDI-only effect
+in_pin:none
+out_pin:none
+
+
+@init // No need to declare variables, they are all global
+
+NOTE_ON  = $x90; // 144
+NOTE_OFF = 0x80; // $xa0;
+CC_MSG   = $xb0; // 176
+
+CC_DYNAMIC = 1;
+CC_VIBRATO_DEPTH = 2;
+CC_VIBRATO_SPEED = 3;
+
+// Poor man's arrays
+dynamicOfChannel = 0;
+memset(/*offset:*/ dynamicOfChannel, /*value:*/ 0, /*len:*/ 16);
+shouldVibrateChannel = 16;
+memset(/*offset:*/ shouldVibrateChannel, /*value:*/ 0, /*len:*/ 16);
+
+
+function midiCalc(val, offset, scale) (
+  max(0, min(127, offset + val * scale / 100)) | 0
+)
+
+@slider
+
+channel1 = slider1 | 0;
+channel9 = slider2 | 0;
+depthOffset = slider3 | 0;
+depthScale = slider4 | 0;
+speedOffset = slider5 | 0;
+speedScale = slider6 | 0;
+
+
+@block
+
+while (midirecv(offset, status, m2, m3)) (
+  channelNum = (status & 15) + 1;  // channel portion of status
+  kind = status & 240;
+  (channel1 <= channelNum && channelNum <= channel9) && (kind == CC_MSG) ? (
+    chan0 = channelNum - 1 | 0;
+    (m2 == CC_VIBRATO_DEPTH) ? (
+      shouldVibrateChannel[chan0] = (m3 == 127) ? 1 : 0;
+      shouldPassThrough = (!shouldVibrateChannel[chan0]);
+    );
+    (m2 == CC_DYNAMIC) ? (
+      dynamicOfChannel[chan0] = m3 | 0;
+      shouldVibrateChannel[chan0] ? (
+        midisend(offset, status, CC_VIBRATO_DEPTH, midiCalc(m3, depthOffset, depthScale));
+        midisend(offset, status, CC_VIBRATO_SPEED, midiCalc(m3, speedOffset, speedScale));
+      );
+      shouldPassThrough = 1;
+    );
+    shouldPassThrough ? (
+      midisend(offset, status, m2, m3); // pass through
+    );
+  ) : (
+    // Not our concern
+    midisend(offset, status, m2, m3); // pass through
+  );
+);
